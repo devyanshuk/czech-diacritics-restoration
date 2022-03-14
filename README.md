@@ -8,7 +8,7 @@ usage: main.py [-h] [-u [USE_TRAINED_MODEL [USE_TRAINED_MODEL ...]]]
 [-f [TEST_FROM_FILE [TEST_FROM_FILE ...]]]
 
 optional arguments:
--h, --help 					show this help message and exit
+-h, --help 			show this help message and exit
 -u, --use_trained_model  	Use already trained model
 --model_path MODEL_PATH 	Model file path
 --train_path TRAIN_PATH 	Train file path
