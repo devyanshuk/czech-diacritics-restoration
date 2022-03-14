@@ -33,7 +33,8 @@ class Train:
         if nonDiacritisizedWord == "":
             return
         if nonDiacritisizedWord in self.wordCache:
-            self.wordCache[nonDiacritisizedWord].append(diacritisizedWord)
+            if not diacritisizedWord in self.wordCache[nonDiacritisizedWord]:
+                self.wordCache[nonDiacritisizedWord].append(diacritisizedWord)
         else:
             self.wordCache[nonDiacritisizedWord] = [diacritisizedWord]
 
@@ -43,12 +44,10 @@ class Train:
         Given a non-diacritisized line and it's corresponding diacritisized line,
         store a non-diacritisized : diacritisized map in wordCache
         """
-        data = dataLine.split()
-        target = targetLine.split()
-        for d, t in zip(data, target):
+        for d, t in zip(dataLine.split(), targetLine.split()):
             noDelimiterData, noDelimiterTarget = "", ""
             for i in range(len(d)):
-                if (isalpha(i) or isdigit(i)):
+                if (isalpha(d[i]) or isdigit(d[i])):
                     noDelimiterData += d[i]
                     noDelimiterTarget += t[i]
             self.storeWordInCache(noDelimiterData.strip(), noDelimiterTarget.strip())
@@ -60,7 +59,7 @@ class Train:
         transforming the window to one-hot encoding and fitting the train and test
         data.
         """
-        model = MLPClassifier()
+        self.model = MLPClassifier()
         oneHotEncodedData, oneHotEncodedTarget = [], []
 
         addWindowOffset = lambda s : " " * WINDOW_SIZE + s.lower() + " " * WINDOW_SIZE
@@ -76,7 +75,7 @@ class Train:
                     oneHotEncodedTarget.append(targetChar)
         oneHotEncodedData = np.array(oneHotEncodedData)
         self.oneHotEncodedTarget = np.array(oneHotEncodedTarget)
-        model.fit(oneHotEncodedData, oneHotEncodedTarget)
+        self.model.fit(oneHotEncodedData, oneHotEncodedTarget)
 
         self.saveModel()
 
@@ -96,3 +95,4 @@ class Train:
         """
         with lzma.open(self.modelPath, "rb") as modelFile:
             self.model, self.wordCache = pickle.load(modelFile)
+            

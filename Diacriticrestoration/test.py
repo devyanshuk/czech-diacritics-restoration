@@ -83,14 +83,14 @@ class Test:
         """
 
         restoreLetterCasing = lambda x, w: \
-            "".join([x[i].upper() if isupper(word[i]) else x[i].lower() for i in range(len(w))])
+            "".join([x[i].upper() if isupper(w[i]) else x[i].lower() for i in range(len(w))])
 
         addWindowOffset = lambda s : " " * WINDOW_SIZE + s.lower() + " " * WINDOW_SIZE
 
         wordWithoutDelimiter = self.removeDelimiters(word)
 
         if wordWithoutDelimiter in self.wordCache:
-            return restoreLetterCasing(self.findClosestWord(self.wordCache[wordWithoutDelimiter], wordWithoutDelimiter))
+            return restoreLetterCasing(self.findClosestWord(self.wordCache[wordWithoutDelimiter], wordWithoutDelimiter), wordWithoutDelimiter)
         else:
             newWord = ""
             wordWithOffset = addWindowOffset(wordWithoutDelimiter)
