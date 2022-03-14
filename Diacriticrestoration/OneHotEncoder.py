@@ -3,23 +3,18 @@ import numpy as np
 
 class OneHotEncoder:
 
-    def __init__(self):
-        self.oneHotEncoderCache = self.getOneHotEncoderCache()
-
     @staticmethod
-    def getOneHotEncoderCache():
+    def getOneHotEncodingForACharacter(x):
         """
-        returns a dictionary with keys as all the 128 ascii characters
-        that are mapped to its corresponding one-hot encoding.
+        returns a one-hot encoding for a char
         """
-        oneHotEncoding = lambda x : [0] * x + [1] + [0] * (127 - x)
+        oneHotEncoding = [0] * ord(x) + [1] + [0] * (127 - ord(x))
 
-        cache = {}
-        for i in range(128):
-            cache[chr(i)] = oneHotEncoding(i)
-            if len(oneHotEncoding(i)) != 128:
-                raise Exception("wrong one-hot encoding.")
-        return cache
+        if len(oneHotEncoding) != 128:
+            raise Exception("wrong one-hot encoding.")
+
+        return oneHotEncoding
+
 
     def getWindowOneHotEncoding(self, window : str):
         """
@@ -30,5 +25,5 @@ class OneHotEncoder:
         """
         oneHotEncoding = []
         for char in window:
-            oneHotEncoding += self.oneHotEncoderCache[char]
+            oneHotEncoding += self.getOneHotEncodingForACharacter(char)
         return np.array(oneHotEncoding)
