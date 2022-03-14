@@ -23,6 +23,8 @@ class Test:
         self.oneHotEncoder = oneHotEncoder
         self.dataset = dataset
         self.wordCache = wordCache
+        self.totalChars = 0
+        self.correctChars = 0
 
     def findClosestWord(self, diacritisizedWord, nonDiacritisizedWord):
         """
@@ -39,7 +41,11 @@ class Test:
         return max(counts, key=itemgetter(1))[0]
 
     
-    def removeDelimiters(self, word):
+    @staticmethod
+    def removeDelimiters(word):
+        """
+        Given a word, remove all delimiters from the word.
+        """
         newWord = ''
         for i in word:
             if isalpha(i) or isdigit(i):
@@ -47,9 +53,15 @@ class Test:
         return newWord
 
 
-    def restoreDelimiters(self, word, wordWithDelimiters):
-        if " " in wordWithDelimiters:
-            print(word)
+    @staticmethod
+    def restoreDelimiters(word, wordWithDelimiters):
+        """
+        Given a word and word with delimiters, create a new word
+        that includes the delimiters.
+        eg: word = "aSd"
+            wordWithDelimiters = ";asd'"
+            new word = ";aSd'"
+        """
         newWord = ""
         index = 0
         for i in range(len(wordWithDelimiters)):
@@ -98,7 +110,21 @@ class Test:
         Given a non-diacritisized line, return a line with diacritics
         added after predicting it.
         """
-        return " ".join(self.performPredictionForASingleWord(word) for word in line.split())   
+        return " ".join(self.performPredictionForASingleWord(word) for word in line.split()) 
+
+
+    def updateCorrectAndTotalChars(self, diacritisizedLine : str, nonDiacritisizedLine : str):
+        """
+        Given a diacritisized line and its undiacritisized variant, update the accuracy of the
+        model.
+        """
+        nonDiaList = nonDiacritisizedLine.split()
+        diaList = diacritisizedLine.split()
+        for nonDia, dia in zip(nonDiaList, diaList):
+            for nd, d in zip(nonDia.strip(), dia.strip()):
+                self.totalChars += 1
+                if nd == d:
+                    self.correctChars += 1
 
 
     def performPredictionsFromSTDIN(self):
@@ -108,13 +134,18 @@ class Test:
         for line in sys.stdin:
             lineWithoutDiacritics = line.translate(Dataset.DIACRITICS_TRANSLATE_TABLE)
             lineWithPredictedDiacritics = self.performPredictionForASingleLine(lineWithoutDiacritics)
+            self.updateCorrectAndTotalChars(line, lineWithPredictedDiacritics)
             print(lineWithPredictedDiacritics)
 
+        print(f"accuracy: {(100 * self.correctChars / self.totalChars):.2f}%")
 
     def performPredictionsFromTestDataset(self):
         """
         read lines from a file and predict(add the diacritics).
         """
-        for line in self.dataset.data:
-            lineWithPredictedDiacritics = self.performPredictionForASingleLine(line)
-            #print(lineWithPredictedDiacritics)
+        for dataLine, targetLine in zip(self.dataset.data, self.dataset.target):
+            lineWithPredictedDiacritics = self.performPredictionForASingleLine(dataLine)
+            self.updateCorrectAndTotalChars(targetLine, lineWithPredictedDiacritics)
+            print(lineWithPredictedDiacritics)
+
+        print(f"accuracy: {(100 * self.correctChars / self.totalChars):.2f}%")

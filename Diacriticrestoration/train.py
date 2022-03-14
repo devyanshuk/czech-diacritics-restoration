@@ -68,7 +68,7 @@ class Train:
         for i in range(len(self.dataset.data)):
             data, target = addWindowOffset(self.dataset.data[i]), addWindowOffset(self.dataset.target[i])
             self.storeWordsInCache(data, target)
-            for j in range(WINDOW_SIZE, len(self.dataset.data) - WINDOW_SIZE):
+            for j in range(WINDOW_SIZE, len(data) - WINDOW_SIZE):
                 if data[j] in CZECH_DIACRITICS_LETTER_MAP:
                     dataWindow = data[j - WINDOW_SIZE : j + WINDOW_SIZE + 1]
                     targetChar = target[j]
@@ -78,13 +78,15 @@ class Train:
         self.oneHotEncodedTarget = np.array(oneHotEncodedTarget)
         model.fit(oneHotEncodedData, oneHotEncodedTarget)
 
+        self.saveModel()
+
     
     def saveModel(self):
         """
         Saves the model to the specified file.
         """
         with lzma.open(self.modelPath, "wb") as modelFile:
-            pickle.dump(self.model, modelFile)
+            pickle.dump((self.model, self.wordCache), modelFile)
 
                 
     def loadModel(self):
@@ -93,4 +95,4 @@ class Train:
         and stores it to model field.
         """
         with lzma.open(self.modelPath, "rb") as modelFile:
-            self.model, _ = pickle.load(modelFile)
+            self.model, self.wordCache = pickle.load(modelFile)
