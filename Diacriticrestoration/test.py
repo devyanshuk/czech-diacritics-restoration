@@ -139,13 +139,17 @@ class Test:
 
         print(f"accuracy: {(100 * self.correctChars / self.totalChars):.2f}%")
 
-    def performPredictionsFromTestDataset(self):
+    def performPredictionsFromTestDataset(self, printResults=False):
         """
         read lines from a file and predict(add the diacritics).
         """
         for dataLine, targetLine in zip(self.dataset.data, self.dataset.target):
             lineWithPredictedDiacritics = self.performPredictionForASingleLine(dataLine)
             self.updateCorrectAndTotalChars(targetLine, lineWithPredictedDiacritics)
-            print(lineWithPredictedDiacritics)
+            if printResults:
+                print(lineWithPredictedDiacritics)
 
-        print(f"accuracy: {(100 * self.correctChars / self.totalChars):.2f}%")
+        accuracy = self.correctChars / self.totalChars
+        self.correctChars = 0
+        self.totalChars = 0
+        return accuracy
