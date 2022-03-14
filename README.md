@@ -46,5 +46,5 @@ optional arguments:
 5) ##### Train a model form a given text file and test using a given text file
 
 	```
-	$ python3 main.py --train_path="train.txt" --f --test_path="test.txt"
+	$ python3 main.py --train_path="train.txt" -f --test_path="test.txt"
 	```
